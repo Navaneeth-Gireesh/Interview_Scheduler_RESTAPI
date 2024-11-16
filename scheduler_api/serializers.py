@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Availability
+from django.contrib.auth.models import User
 from datetime import datetime, date
 
 # Serializer For Availability Slot Booking
@@ -14,7 +15,6 @@ class AvailabilitySerializer(serializers.ModelSerializer):
         model               = Availability
         fields              = ['user_id','username','user_type','booked_id','available_date', 
                                'available_time_from', 'available_time_to']
-        read_only_fields    = ['user_id']
 
     # Function to get user type date into user_type variable
     def get_user_type(self, obj):
@@ -43,6 +43,7 @@ class AvailabilitySerializer(serializers.ModelSerializer):
         '''
         user                        = self.context['request'].user
 
+
         # User entered availability date
         available_date              = data['available_date']
 
@@ -58,7 +59,7 @@ class AvailabilitySerializer(serializers.ModelSerializer):
         overlapping_slots = Availability.objects.filter( user = user, available_date = available_date, 
                                                         available_time_from__lt = available_time_to,
                                                         available_time_to__gt = available_time_from)
-
+        # Validation if already same timing slot is created
         if overlapping_slots.exists():
             raise serializers.ValidationError("You have already booked a slot on this time frame")
         
@@ -81,7 +82,44 @@ class AvailabilitySerializer(serializers.ModelSerializer):
         return data
 
 
-
 class SchedulableTimeSerializer(serializers.Serializer):
     candidate_id        = serializers.IntegerField(required = True)
-    hr_id               = serializers.IntegerField(required = True)
+    interviewer_id       = serializers.IntegerField(required = True)
+
+
+# User Registration Serializer
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only = True, style = {'input_type' : 'password'})
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
+
+    def validate_email(self, value):
+        '''
+        Function to check if an account with the same email exists
+        '''
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email already exists")
+        return value
+
+    def validate_username(self, value):
+        '''
+        Function to check if an account with the same username exists
+        '''
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Username already exists")
+        return value
+
+        
+    def create(self, validated_data):
+        user = User.objects.create(
+            username    = validated_data['username'],
+            email       = validated_data['email'],
+                
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+
+
+

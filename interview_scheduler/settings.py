@@ -54,12 +54,13 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',                 # Requires authentication
     ),
     'DEFAULT_PAGINATION_CLASS': (
-        'rest_framework.pagination.PageNumberPagination',                 # Pagination
+        'rest_framework.pagination.PageNumberPagination',              # Pagination
     ),
     'DEFAULT_FILTER_BACKENDS': (
         
-        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.SearchFilter',                         # Search Filter
     ),
+
 }
 
 
