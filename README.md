@@ -16,7 +16,7 @@ Before running the project, ensure the following are installed:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/Interview_Scheduler_RESTAPI.git
+   git clone https://github.com/Navaneeth-Gireesh/Interview_Scheduler_RESTAPI.git
 
 2. **Navigate to the project directory**:
    ```bash
